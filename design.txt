@@ -1,0 +1,56 @@
+The interpreter has following classes:
+
+1. Main.java: This is the main class of the interpreter. It takes input from standard input until a "$" occurs. It then sends the input to parser to parse and get S-Expression in dot notation. Once a "$$" occurs, it parses final input expression and exits the program.
+
+2. Tokenizer.java: When the input expression is sent to Parser, Parser first split it into tokens. Tokens are split using following way:
+	a. First, spaces are inserted before and after '(', '(', '.'.
+	b. Then, all types of spaces are replaced with a single space ' '.
+	c. Input is split at ' ' so that tokens can be an integer, a symbol, a left brace, a right brace or a dot.
+	d. Number of tokens is a class variable to store total number of tokens got after splitting at ' '.
+	e. Current token is the index of token parsed at present. Every time a token is parsed, it is incremented to point to the next token.
+	f. If none of this is found, input is invalid.
+	g. For matching integer pattern. java.util.regex package is used. If length exceeds more than 6 characters, exception is thrown.
+	h. Symbol is matched in the same way with a limit of 10 characters.
+	i. If exception is thrown, tokenizer checks current token to see what type of error it is and returns it back as a string to the customeException class.
+
+A structure similar to symbol table is also maintained within this class for ease of use. Whenever an identifier is found, it checks if it already exists in the table. If yes, it returns a pointer to corresponding S-Expression. If not, it creates a new S-Expression. For integer, it simply creates S-Expression without keeping a track of existing symbols as suggested in the discussion on the course page. 
+
+Note: Since the tokens are split at space, it doesn't raise error of unexpected space. It rather checks for a detailed explanation on the error. It tries to find any invalid characters, lower case characters, unexpected '.', '(', ')', missing brace, integer and symbol limit or any other unexpcted token.
+
+3. Parser.java: This class is used for parsing input expression sent by Main class. Once it gets input from Main class, it sends it to tokenizer to get tokens. Then it checks each token sequentially to parse input.
+
+Following is a high level idea of how the input is parsed:
+1. First, parseCar is called to parse car of the given S-Expression. It can be a left brace, an integer atom, a NIL atom, an identifier, a non-atomic S-Expression or a right brace only if there is a previously seen left brace.
+2. Once this is parsed, if an integer or symbolic atom is returned, rest of the expression is parsed using parseCdr. Otherwise, rest of the part is recursively parsed as a new S-Expression having both car and cdr using parseCar and parseCdr. This logic is similar to a discussion posted on the course page about input and input2 for parsing the expression. (Link: http://web.cse.ohio-state.edu/~soundarajan.1/courses/6341/lispInput1.txt)
+3. Both these functions have a boolean argument seenLeftBrace. This is used for matching braces. Whenever a right brace occurs, it checks if the value of seenLeftBrace is true. If not, input is invalid.
+
+4. SExpression.java: This class used the exact implementation given in the question for creating SExpression class. It has following variables:
+  1) int type: 1 for integer, 2 for symbolic atom and 3 for non-atomic
+  2) Constructor overloading is implemented to invoke appropriate S-Expression creation depending on whether an integer is passed, a symbolic atom (string) is passed or Car(S-Expression) and Cdr(S-Expression) are passed.
+  3) It also has a function to recusrively build display for an S-Expression which is used for printing dot notation.
+
+ This class has following built-in functions for performing operations on S-Expressions:
+
+T, NIL, CAR, CDR, CONS, ATOM, EQ, NULL, INT, PLUS, MINUS, TIMES, QUOTIENT, REMAINDER, LESS, GREATER, COND, QUOTE
+
+5. Evaluator.java: This function implements evaluation of the input S-Expression. It has exactly same structure as defined in the slides and discussed in the class. Here is the link for reference: http://web.cse.ohio-state.edu/~soundarajan.1/courses/6341/SLIDES/p22.ppt
+
+Functions:
+	a. eval(): It takes S-Expression as input. If it is NIL, Integer or T atom, it returns the value. Otherwise, it looks in the AList for the value of the atom. If not it throws unbound atom exception. If car is symbolic atom, it checks the name of the function and further calls appropriate function as defined in the slides. If the function name if defun, it checks if it is defined properly with valid arguments and then adds it to the DList.
+
+	b. evcon() and evlis() - This is exactly same as given in the link above.
+
+	c. apply() - This is also same as given in the slides. If the functions is different from built-in functions, it goes into the DList to find definition and formal parameters. If not found, it raises an exception with undefined function. Otherwise, it adds the actual arguments to the AList and calls eval(). After execution, it removes the arguments from the AList.
+
+	d. Helper functions: 
+		countArgs() - Counts arguments from an S-Expression.
+		checkIfValidArgs() - Depending upon the function, it checks if the arguments are valid or raises an exception.
+		checkIfValidDefun() - Checks if function defined using defun has valid parameters, name and body.
+
+6. Defun.java: This class is used to create function objects for User defined Functions (UDFs). Whenever a function is defined using defun, it creates a defun object which has three variables - function name (String), parameters (list of Strings) and function body (S-Expression). Parameters are converted from S-Expression to a list so that it becomes easier to handle and validate actual arguments.
+
+7. DList.java: This class implements DList in form of a hashmap. It maps name of the function to Defun object which stored information about the function as mentioned above. It has two functions - addFunction() which adds function for the given name, and getFunction which returns defun object for the corresponding name of the function if it is defined in the DList.
+
+8. AList.java: This class implements AList, also in form of a hashmap. It maps name of the parameter to a list of strings of arguments. The reason for using list is to implement scope of the variables. For example, if a function is called within itself, the same parameter will have different arguments depending upon the scope. So structure of AList makes sure that the latest value is taken for evaluation of the function.
+
+9. customException.java: This class just extends Exception class for throwing customized exceptions. For invoking constructor, it takes exception along with error type. Error type can either be 'Parser' or 'Evaluation' depending upon whether it occurs while parsing or evaluation.

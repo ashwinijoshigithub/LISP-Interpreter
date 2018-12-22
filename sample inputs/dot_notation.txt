@@ -1,0 +1,77 @@
+   ( 2 . (3 4))
+   $
+> (2 . (3 . (4 . NIL)))
+
+
+   ( 2 . (3 4) . 5)
+> **error: unexpected dot**
+   $
+
+
+   ( 2 . ((3 4) . 5))
+   $
+> (2 . ((3 . (4 . NIL)) . 5))
+
+
+   ( 2 . (3 4) $ 5)
+> **error: unexpected dollar**
+   $
+
+   ( 2 (3 . 4) (5 . 6))
+   $
+> (2 . ((3 . 4) . ((5 . 6) . NIL)))
+
+
+   (CAR (QUOTE (A . B)))
+   $
+> (CAR . ((QUOTE . ((A . B) . NIL)) . NIL))
+
+
+   (CONS 4 (QUOTE (A . B)))
+   $
+>  (CONS . (4 . ((QUOTE . ((A . B) . NIL)) . NIL)))
+
+
+   (CONS 4 (A . B))
+   $
+>  (CONS . (4 . ((A . B) . NIL)))
+
+
+   (DEFUN SILLY (A B) (PLUS A B))
+   $
+>  (DEFUN . (SILLY . ((A . (B . NIL)) . ((PLUS . (A . (B . NIL))) . NIL))))
+
+
+   (SILLY 5 6)
+   $
+>  (SILLY . (5 . (6 . NIL)))
+
+
+   (SILLY (CAR (QUOTE (5 . 6))) (CDR (QUOTE (5 . 6))) )
+   $
+>  (SILLY . ( (CAR . ((QUOTE . ((5 . 6) . NIL)) . NIL)) .
+               ( (CDR . ((QUOTE . ((5 . 6) . NIL)) . NIL)) . NIL)))
+
+
+   (DEFUN MINUS2 (A B) (MINUS A B))
+   $
+>  (DEFUN . (MINUS2 . ((A . (B . NIL)) . ((MINUS . (A . (B . NIL))) . NIL))))
+
+
+   (DEFUN NOTSOSILLY (A B) 
+            (COND
+               ((EQ A 0) (PLUS B 1))
+               ((EQ B 0) (NOTSOSILLY (MINUS2 A 1) 1))
+               (T (NOTSOSILLY (MINUS2 A 1) (NOTSOSILLY A (MINUS2 B 1))))
+             ))
+   $
+>  (DEFUN . (NOTSOSILLY . ((A . (B . NIL)) . ((COND . ( ( (EQ . (A . (0 . NIL))) . ( (PLUS . (B . (1 . NIL))) . NIL)) . ( ( (EQ . (B . (0 . NIL))) . ( (NOTSOSILLY . ((MINUS2 .(A . (1 . NIL))) . (1 . NIL))) . NIL)) . ( (T . ((NOTSOSILLY . ( (MINUS2 . (A . (1 . NIL))) . 
+                 ( (NOTSOSILLY . (A . ((MINUS2 . (B . (1 . NIL))) . NIL))) . NIL))) . NIL)) . NIL)))) . NIL))))
+
+
+   (NOTSOSILLY 0 0)
+   $$
+>  (NOTSOSILLY . (0 . (0 . NIL)))
+>  Bye!
+
+   

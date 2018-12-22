@@ -1,0 +1,36 @@
+   (CAR (QUOTE (A . B)))
+ > A
+
+
+   (CONS 4 (QUOTE (A . B)))
+ > (4 . (A . B))
+dot notation: 
+   (CONS . (4 . ((QUOTE . ((A . B) . NIL)) . NIL)))
+
+
+
+   (CONS 4 (A . B))
+ > error (trying to evaluate (A . B) )
+dot notation: 
+   (CONS . (4 . ((A . B) . NIL)))
+
+
+
+   (DEFUN (SILLY (A B)) (PLUS A B))
+ > SILLY
+dot notation: 
+***Note: the following is *wrong*; try to come up with the correct version***
+   (DEFUN . ((SILLY . ((A . (B . NIL)) . ((PLUS . (A . (B . NIL))) . NIL))))
+
+
+   (SILLY 5 6)
+ > 11
+dot notation: 
+   (SILLY . (5 . (6 . NIL)))
+
+
+   (SILLY (CAR (QUOTE (5 . 6))) (CDR (QUOTE (5 . 6))) )
+ > 11
+dot notation: 
+  (SILLY . ( (CAR . ((QUOTE . ((5 . 6) . NIL)) . NIL)) .
+               ( (CDR . ((QUOTE . ((5 . 6) . NIL)) . NIL)) . NIL)))
