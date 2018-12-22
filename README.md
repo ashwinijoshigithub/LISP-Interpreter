@@ -2,7 +2,7 @@
 Implementation of LISP interpreter in Java
 
 
-1. For details about the structure of Interpreter, please refer to design.txt file. To run the code, go inside the directory of the project where all '.java' files are stored. It contains a Makefile. 
+1. For details about the structure of Interpreter, please refer to design.txt file. To run the code, go inside the src directory of the project where all '.java' files are stored. It contains a Makefile. 
 
 2. After going in the main directory, type 
 > make <br /> 
