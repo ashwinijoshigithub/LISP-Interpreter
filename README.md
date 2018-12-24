@@ -1,4 +1,4 @@
-# LISP-interpreter
+# LISP-Interpreter
 Implementation of LISP interpreter in Java
 
 
